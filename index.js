@@ -43,11 +43,8 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    
     const id = Number(request.params.id)
-
     phonebook = phonebook.filter(person => person.id !== id)
-
     response.status(204).end()
 })
 
@@ -57,8 +54,13 @@ generateRandomId = () => {
 
 app.post('/api/persons/', (request, response) => {
     const body = request.body
+    const names = phonebook.map(person =>person.name)
+    if (names.includes(body.name)) {
+        return response.status(400).json({
+            error: 'Name must be unique'
+        })
+    }
 
-    
     if (!body.name && !body.number) {
         return response.status(400).json({
             error: 'Name and number missing'
@@ -82,15 +84,12 @@ app.post('/api/persons/', (request, response) => {
         name: body.name,
         number: body.number,
     }
-
     phonebook = phonebook.concat(person)
-
     response.json(person)
 })
 
 app.get('/info', (request, response) => {
     const datetime = new Date(Date.now()).toString()
-    
     const info =
     `
     <p>Phonebook has info for ${phonebook.length} people.</p>
