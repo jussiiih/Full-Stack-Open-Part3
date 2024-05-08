@@ -30,10 +30,13 @@ app.get('/api/persons', (request, response) => {
     response.json(phonebook)
 })
 
+app.get('')
+
 app.get('/info', (request, response) => {
     const datetime = new Date(Date.now()).toString()
     
-    const info = `
+    const info =
+    `
     <p>Phonebook has info for ${phonebook.length} people.</p>
     <p>${datetime}</p>
     `
