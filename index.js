@@ -8,6 +8,9 @@ morgan.token('req-body', function (req, res) {
     return JSON.stringify(req['body'])})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
 
+const cors = require('cors')
+app.use(cors())
+
 let phonebook = [
     {
         id: 1,
