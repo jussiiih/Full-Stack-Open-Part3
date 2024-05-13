@@ -70,56 +70,62 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons/', (request, response) => {
     const body = request.body
-    
-    /*
-    const names = phonebook.map(person =>person.name)
-    if (names.includes(body.name)) {
-        return response.status(400).json({
-            error: 'Name must be unique'
-        })
-    }
 
-    if (!body.name && !body.number) {
-        return response.status(400).json({
-            error: 'Name and number missing'
-        })
-    }
+    Person.find({})
+    .then (people => {
+        console.log(people.find(person => person.name === body.name))
+        if (people.find(person => person.name === body.name)) {
+            return response.status(400).json({
+                error: 'Name must be unique'
+            }) 
+        }
     
-    else if (!body.name) {
-        return response.status(400).json({
-            error: 'Name missing'
-        })
-    }
+        if (!body.name && !body.number) {
+            return response.status(400).json({
+                error: 'Name and number missing'
+            })
+        }
+        
+        else if (!body.name) {
+            return response.status(400).json({
+                error: 'Name missing'
+            })
+        }
 
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'Number missing'
-        })
-    }
-    */
+        if (!body.number) {
+            return response.status(400).json({
+                error: 'Number missing'
+            })
+        }
 
-    const person = new Person ({
-        name: body.name,
-        number: body.number,
-    })
     
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
+
+        const person = new Person ({
+            name: body.name,
+            number: body.number,
+        })
+        
+        person.save().then(savedPerson => {
+            response.json(savedPerson)
+        })
     })
 })
 
-//Ei toimi vielä
-/*
+
 app.get('/info', (request, response) => {
     const datetime = new Date(Date.now()).toString()
-    const info =
-    `
-    <p>Phonebook has info for ${phonebook.length} people.</p>
-    <p>${datetime}</p>
-    `
-    response.send(info)
+    
+    Person.find({})
+        .then (people => {
+            const info =
+                `
+                <p>Phonebook has info for ${people.length} people.</p>
+                <p>${datetime}</p>
+                `
+            response.send(info)
+        })
+        
 })
-*/
 
 const unknownEndpoint = (request, response) => {
     console.log('Unknown endpoint')
