@@ -1,7 +1,10 @@
 const express = require('express')
 const app = express()
-
 app.use(express.json())
+
+require('dotenv').config()
+
+const Person = require('./models/person')
 
 const morgan = require('morgan')
 morgan.token('req-body', function (req, res) {
@@ -13,7 +16,7 @@ app.use(cors())
 
 app.use(express.static('dist'))
 
-let phonebook = [
+/*let phonebook = [
     {
         id: 1,
         name: 'Arto Hellas',
@@ -34,24 +37,35 @@ let phonebook = [
         name: 'Mary Poppendieck',
         number: '39-23-6423122'
     }
-]
+]*/
 
+
+/*app.get('/api/persons', (request, response) => {
+    response.json(phonebook)
+})*/
 
 app.get('/api/persons', (request, response) => {
-    response.json(phonebook)
+    Person.find({}).then(people => {
+        response.json(people)
+    })
 })
+
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = phonebook.find(person => person.id == id)
-    if (person) {
-        response.json(person)
-    }
-    else {
-        response.status(404).end()
-    }
+    const id = request.params.id
+    
+    Person.findById(id)
+        .then(person => {
+            if (person) {
+                response.json(person)
+            }
+            else {
+                response.status(404).end()
+            }    
+        })
 })
 
+//Ei toimi vielä
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     phonebook = phonebook.filter(person => person.id !== id)
@@ -64,6 +78,7 @@ generateRandomId = () => {
 
 app.post('/api/persons/', (request, response) => {
     const body = request.body
+    
     const names = phonebook.map(person =>person.name)
     if (names.includes(body.name)) {
         return response.status(400).json({
@@ -88,6 +103,7 @@ app.post('/api/persons/', (request, response) => {
             error: 'Number missing'
         })
     }
+    
 
     const person = {
         id: generateRandomId(),
@@ -108,7 +124,7 @@ app.get('/info', (request, response) => {
     response.send(info)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
     })
