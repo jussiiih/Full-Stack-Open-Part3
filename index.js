@@ -1,15 +1,20 @@
 const express = require('express')
 const app = express()
-app.use(express.json())
-
 require('dotenv').config()
 
-const Person = require('./models/person')
+app.use(express.static('build'))
+
+app.use(express.json())
 
 const morgan = require('morgan')
 morgan.token('req-body', function (req, res) {
     return JSON.stringify(req['body'])})
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :req-body'))
+
+
+
+const Person = require('./models/person')
+
 
 const cors = require('cors')
 app.use(cors())
@@ -24,28 +29,20 @@ app.get('/api/persons', (request, response) => {
 })
 
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    
-    Person.findById(id)
+app.get('/api/persons/:id', (request, response, next) => {
+    Person.findById(request.params.id)
         .then(person => {
             if (person) {
                 response.json(person)
             }
             else {
+                console.log('ID not found in Phonebook')
                 response.status(404).end()
             }    
         })
+        .catch(error => next(error))
 })
 
-//Ei toimi vielä
-/*
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    phonebook = phonebook.filter(person => person.id !== id)
-    response.status(204).end()
-})
-*/
 
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndDelete(request.params.id)
@@ -56,11 +53,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 })
 
-/* MongoDB takes care of creating id, no need for this any more
-generateRandomId = () => {
-    return Math.floor(Math.random() * 10000)
-}
-*/
 
 app.post('/api/persons/', (request, response) => {
     const body = request.body
@@ -114,6 +106,25 @@ app.get('/info', (request, response) => {
     response.send(info)
 })
 */
+
+const unknownEndpoint = (request, response) => {
+    console.log('Unknown endpoint')
+    response.status(404).send({error: 'Unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        console.log('Malformatted id')
+        return response.status(400).send({error: 'Malformatted id'})
+    }
+next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
