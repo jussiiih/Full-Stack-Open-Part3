@@ -47,6 +47,15 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 */
 
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+                response.status(204).end()
+        })
+        .catch(error => next(error))
+
+})
+
 /* MongoDB takes care of creating id, no need for this any more
 generateRandomId = () => {
     return Math.floor(Math.random() * 10000)
@@ -84,7 +93,6 @@ app.post('/api/persons/', (request, response) => {
     */
 
     const person = new Person ({
-        //id: generateRandomId(),
         name: body.name,
         number: body.number,
     })
