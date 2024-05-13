@@ -16,33 +16,6 @@ app.use(cors())
 
 app.use(express.static('dist'))
 
-/*let phonebook = [
-    {
-        id: 1,
-        name: 'Arto Hellas',
-        number: '040-123456'
-    },
-    {
-        id: 2,
-        name: 'Ada Lovelace',
-        number: '39-44-5323523'
-    },
-    {
-        id: 3,
-        name: 'Dan Abramov',
-        number: '12-43-234345'
-    },
-    {
-        id: 4,
-        name: 'Mary Poppendieck',
-        number: '39-23-6423122'
-    }
-]*/
-
-
-/*app.get('/api/persons', (request, response) => {
-    response.json(phonebook)
-})*/
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(people => {
@@ -66,11 +39,13 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 //Ei toimi vielä
+/*
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
     phonebook = phonebook.filter(person => person.id !== id)
     response.status(204).end()
 })
+*/
 
 generateRandomId = () => {
     return Math.floor(Math.random() * 10000)
@@ -79,6 +54,7 @@ generateRandomId = () => {
 app.post('/api/persons/', (request, response) => {
     const body = request.body
     
+    /*
     const names = phonebook.map(person =>person.name)
     if (names.includes(body.name)) {
         return response.status(400).json({
@@ -103,17 +79,21 @@ app.post('/api/persons/', (request, response) => {
             error: 'Number missing'
         })
     }
-    
+    */
 
-    const person = {
+    const person = new Person ({
         id: generateRandomId(),
         name: body.name,
         number: body.number,
-    }
-    phonebook = phonebook.concat(person)
-    response.json(person)
+    })
+    
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
 })
 
+//Ei toimi vielä
+/*
 app.get('/info', (request, response) => {
     const datetime = new Date(Date.now()).toString()
     const info =
@@ -123,6 +103,7 @@ app.get('/info', (request, response) => {
     `
     response.send(info)
 })
+*/
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
