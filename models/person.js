@@ -13,13 +13,36 @@ mongoose.connect(url)
         console.log('error connecting to MongoDB', error.message)
     })
 
+
+function begins_two_or_three_numbers_and_dash (val) {
+    return (/^[0-9]{2,3}-/).test(val)
+}
+
+function only_one_dash (val) {
+    return /^([^-]*-){1}[^-]*$/.test(val)
+}
+
+function use_numbers_only (val) {
+    return (/-[0-9]*$/).test(val)
+}
+
+const numberValidators = [
+    {validator: begins_two_or_three_numbers_and_dash, message: 'Number must begin with either two or three numbers followed by a dash'},
+    {validator: only_one_dash, message: 'Number can have only one dash'},
+    {validator: use_numbers_only, message: 'Besides the dash, use numbers only'}
+]
+    
 const personSchema = new mongoose.Schema({
     id: String,
-    name:{
+    name: {
        type: String,
        minlength: 3 
     },
-    number: String,
+    number: {
+       type: String,
+       minlength: 8,
+       validate: numberValidators
+    } 
 })
 
 personSchema.set('toJSON', {
