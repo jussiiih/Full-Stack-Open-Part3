@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../Full-Stack-Open/osa2/puhelinluettelo && npm run build && cp -r dist ../Full-Stack-Open-Part3",
+    "build:ui": "del /S /Q ..\\Full-Stack-Open-Part3\\dist && cd ..\\Full-Stack-Open\\osa2\\puhelinluettelo && npm run build && xcopy /S /Y dist ..\\..\\..\\Full-Stack-Open-Part3\\dist",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "repository": {
